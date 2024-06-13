@@ -10,13 +10,6 @@ async function execCommand(command, options = {}) {
 
 async function run() {
     let version = core.getInput('version')
-    const buildNumber = core.getInput('build-number')
-    const versionPath = core.getInput('version-path')
-
-    if (versionPath) {
-        const content = fs.readFileSync(versionPath, 'utf8')
-        version = content.trim()
-    }
 
     if (version) {
         core.setOutput('version', version)
@@ -34,27 +27,6 @@ async function run() {
             }}
         })
     }
-
-    if (!buildNumber) {
-        const command = `agvtool next-version -all`
-        console.log(command)
-        await execCommand(command).catch(error => {
-            core.setFailed(error.message)
-        })
-    } else {
-        const command = `agvtool new-version -all ${buildNumber}`
-        console.log(command)
-        await execCommand(command).catch(error => {
-            core.setFailed(error.message)
-        })
-    }
-
-    await execCommand(`agvtool what-version -terse`, {
-        listeners: { stdout: (data) => {
-            console.log(data)
-            core.setOutput('build-number', data.toString().trim())
-        }}
-    })
 }
 
 run()
